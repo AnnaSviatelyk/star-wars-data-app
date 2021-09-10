@@ -7,7 +7,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+@font-face {
+  font-family: 'SfDistantGalaxy-Italic';
+  src: local('SfDistantGalaxy-Italic'),
+    url(./fonts/SfDistantGalaxyOutlineItalic-4yA4.ttf) format('truetype');
+  /* other formats include: 'woff2', 'truetype, 'opentype',
+                            'embedded-opentype', and 'svg' */
+}
+
+@font-face {
+  font-family: 'SfDistantGalaxy';
+  src: local('SfDistantGalaxy'),
+    url(./fonts/SfDistantGalaxyItalic-WV3Y.ttf) format('truetype');
+  /* other formats include: 'woff2', 'truetype, 'opentype',
+                            'embedded-opentype', and 'svg' */
 }
