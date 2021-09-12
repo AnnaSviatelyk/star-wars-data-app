@@ -2,9 +2,14 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import * as R from 'ramda';
 import styled from 'styled-components';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
+import { Switch, Route } from 'react-router-dom';
 
 import NamesList from './components/names-section/NamesList';
+import Favorites from './components/favorites-section/Favorites';
 import convertNumberToRoman from './helpers/convertNumberToRoman';
+import toDashCase from './helpers/toDashCase';
 
 const SWAPI_BASE_URL = 'https://swapi.dev/api/';
 const TOTAL_PEOPLE_PAGES = 9;
@@ -28,10 +33,15 @@ const App = () => {
       .map((el) => ({
         name: el.name,
         url: el.url,
-        birthYear: el.birth_year,
+        birthYear:
+          el.birth_year === 'unknown' ? el.birth_year : parseInt(el.birth_year),
         specie: el.species,
         film: el.films,
+        starships: el.starships,
+        id: toDashCase(el.name),
       }));
+
+    console.log({ peopleData });
 
     setPeople(peopleData);
   }, []);
@@ -55,8 +65,7 @@ const App = () => {
     const results = await axios.all(urls.map((url) => axios.get(url)));
 
     const speciesData = results
-      .map((el) => el.data.results)
-      .flat()
+      .flatMap((el) => el.data.results)
       .map((el) => ({
         value: el.url,
         label: el.name,
@@ -80,9 +89,19 @@ const App = () => {
   }, [films, getFilms, getPeople, getSpecies, people, species]);
 
   return (
-    <AppContainer>
-      <NamesList allPeople={people} species={species} films={films} />
-    </AppContainer>
+    <DndProvider backend={HTML5Backend}>
+      <AppContainer>
+        <Switch>
+          <Route path="/person/:id">
+            <div>TEEEEEEEESTTTTTTT</div>
+          </Route>
+          <Route exact path="/">
+            <NamesList allPeople={people} species={species} films={films} />
+            <Favorites />
+          </Route>
+        </Switch>
+      </AppContainer>
+    </DndProvider>
   );
 };
 
@@ -92,7 +111,7 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   font-size: calc(10px + 2vmin);
   color: white;
 `;

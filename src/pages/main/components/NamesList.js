@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import * as R from 'ramda';
 
-import Loader from '../Loader';
-import ListItem from './ListItem';
 import Filters from './Filters';
+import ListItem from './ListItem';
+import Loader from '../../../Loader';
 
 const NamesList = ({ allPeople, species, films }) => {
   const [peopleToDisplay, setPeopleToDisplay] = useState([]);
@@ -15,10 +15,6 @@ const NamesList = ({ allPeople, species, films }) => {
     () => listRef.current.scrollTo({ top: 0, behavior: 'smooth' }),
     [],
   );
-
-  useEffect(() => {
-    setPeopleToDisplay(allPeople);
-  }, [allPeople]);
 
   return (
     <Container ref={listRef}>
@@ -32,12 +28,22 @@ const NamesList = ({ allPeople, species, films }) => {
             setPeopleToDisplay={setPeopleToDisplay}
           />
 
-          {peopleToDisplay.map((el) => (
-            <ListItem name={el.name} url={el.url} key={el.url} />
+          {peopleToDisplay.map((el, index) => (
+            <ListItem name={el.name} url={el.url} key={el.url} id={el.id} />
           ))}
-          <ScrollToTopButton onClick={handleScrollToTop} type="button">
-            Scroll to top ↑
-          </ScrollToTopButton>
+
+          {peopleToDisplay.length > 10 && (
+            <ScrollToTopButton onClick={handleScrollToTop} type="button">
+              Scroll to top ↑
+            </ScrollToTopButton>
+          )}
+
+          {peopleToDisplay.length === 0 && (
+            <p>
+              Opps, no characters found. <br />
+              Try another filter parameters
+            </p>
+          )}
         </>
       ) : (
         <LoaderContainer>
@@ -52,6 +58,7 @@ const Container = styled.div`
   width: 55%;
   height: 100vh;
   padding: 50px 50px 50px 50px;
+  margin-right: 40px;
   background-color: #1f2329;
   overflow: scroll;
   display: flex;

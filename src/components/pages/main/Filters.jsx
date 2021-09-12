@@ -2,20 +2,23 @@ import * as R from 'ramda';
 import React, { useCallback, useState, useEffect } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
+import { Range } from 'rc-slider';
+
+const DEFAULT_YEARS_RANGE = [8, 896];
 
 const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
   const [isAndRelationship, setIsAndRelationship] = useState(true);
   const [filters, setFilters] = useState({
     film: films[0],
     specie: species[0],
-    yearsRange: null,
+    yearsRange: DEFAULT_YEARS_RANGE,
   });
 
   const resetFiltersHandler = useCallback(() => {
     setFilters({
       film: films[0],
       specie: species[0],
-      yearsRange: null,
+      yearsRange: DEFAULT_YEARS_RANGE,
     });
   }, [films, setFilters, species]);
 
@@ -29,32 +32,48 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
     }),
   };
 
+  const filterItems = useCallback(
+    (person, key) => {
+      if (key === 'yearsRange') {
+        const [minYear, maxYear] = filters[key];
+        const birthYear = person.birthYear;
+
+        return birthYear >= minYear && birthYear <= maxYear;
+      }
+
+      const filterValue = filters[key].value;
+
+      return person[key].includes(filterValue);
+    },
+    [filters],
+  );
+
   const filterCharachters = useCallback(() => {
     const activeFilters = Object.keys(filters).filter((key) => {
-      return !R.isNil(filters[key]) && filters[key].value !== 'all';
+      if (key === 'yearsRange') {
+        return (
+          filters[key][0] !== DEFAULT_YEARS_RANGE[0] ||
+          filters[key][1] !== DEFAULT_YEARS_RANGE[1]
+        );
+      }
+
+      return filters[key].value !== 'all';
     });
 
     if (R.isEmpty(activeFilters)) {
       return setPeopleToDisplay(allPeople);
     }
 
-    console.log({ activeFilters });
-
     const filteredPeople = allPeople.filter((person) => {
       if (isAndRelationship) {
-        return activeFilters.every((key) =>
-          person[key].includes(filters[key].value),
-        );
+        return activeFilters.every((key) => filterItems(person, key));
       }
 
-      return activeFilters.some((key) =>
-        person[key].includes(filters[key].value),
-      );
+      return activeFilters.some((key) => filterItems(person, key));
     });
 
-    console.log({ allPeople });
     setPeopleToDisplay(filteredPeople);
-  }, [filters, allPeople, setPeopleToDisplay, isAndRelationship]);
+  }, [filters, allPeople, setPeopleToDisplay, isAndRelationship, filterItems]);
 
   useEffect(() => {
     filterCharachters();
@@ -72,7 +91,7 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
         onChange={(value) =>
           setFilters({
             ...filters,
-            specie: value,
+            specie: value.reverse(),
           })
         }
         styles={customSelectStyles}
@@ -92,6 +111,31 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
         }
         styles={customSelectStyles}
       />
+      <p>{isAndRelationship ? 'and' : 'or'}</p>
+      <p>Birth Year</p>
+      <RangeContainer>
+        <Range
+          defaultValue={DEFAULT_YEARS_RANGE}
+          value={filters.yearsRange}
+          min={DEFAULT_YEARS_RANGE[0]}
+          max={DEFAULT_YEARS_RANGE[1]}
+          step={1}
+          reverse
+          onChange={(value) => {
+            console.log({ value });
+            setFilters({
+              ...filters,
+              yearsRange: value,
+            });
+          }}
+        />
+        <div style={{ display: 'inline-block' }}>
+          {filters.yearsRange[1]} BBY
+        </div>
+        <div style={{ display: 'inline-block', marginLeft: '50px' }}>
+          {filters.yearsRange[0]} BBY
+        </div>
+      </RangeContainer>
       <ChangeFilteringLogicButton onClick={toggleFilteringLogic}>
         {isAndRelationship
           ? 'Seach by one of the criterias'
@@ -112,6 +156,10 @@ const ResetButton = styled.button`
 
 const ChangeFilteringLogicButton = styled.button`
   margin-right: 30px;
+`;
+
+const RangeContainer = styled.div`
+  height: 50px;
 `;
 
 export default Filters;
