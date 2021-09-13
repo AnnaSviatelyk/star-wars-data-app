@@ -27,12 +27,6 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
     setIsAndRelationship((state) => !state);
   }, []);
 
-  const customSelectStyles = {
-    placeholder: () => ({
-      width: '50%',
-    }),
-  };
-
   const filterItems = useCallback(
     (person, key) => {
       if (key === 'yearsRange') {
@@ -80,42 +74,84 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
     filterCharachters();
   }, [filterCharachters]);
 
+  const selectStyles = {
+    control: (provided) => ({
+      ...provided,
+      backgroundColor: '#333',
+      outline: 'none',
+      border: 'none',
+      boxShadow: 'none',
+    }),
+
+    singleValue: (provided) => ({
+      ...provided,
+      color: '#fff',
+      fontFamily: 'Roboto',
+      fontSize: 16,
+    }),
+    menu: (provided, state) => ({
+      ...provided,
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      paddingTop: 0,
+      paddingBottom: 0,
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      color: state.isSelected ? '#333' : '#fff',
+      fontFamily: 'Roboto',
+      fontSize: 16,
+      padding: 20,
+      backgroundColor: state.isSelected
+        ? '#ffe81f'
+        : state.isFocused
+        ? '#33333380'
+        : '#333',
+      ':active': {
+        backgroundColor: !state.isDisabled && '#33333380',
+      },
+    }),
+  };
+
   return (
     <Container>
       <Title>Filter by</Title>
-      <FilterContainer>
-        <FilterName>Specie</FilterName>
-        <Select
-          value={filters.specie}
-          options={species}
-          defaultValue={species[0]}
-          isSearchable={true}
-          onChange={(value) =>
-            setFilters({
-              ...filters,
-              specie: value,
-            })
-          }
-          styles={customSelectStyles}
-        />
-      </FilterContainer>
+      <SelectsContainer>
+        <FilterContainer>
+          <FilterName>Specie</FilterName>
+          <Select
+            value={filters.specie}
+            options={species}
+            defaultValue={species[0]}
+            isSearchable={true}
+            onChange={(value) =>
+              setFilters({
+                ...filters,
+                specie: value,
+              })
+            }
+            styles={selectStyles}
+          />
+        </FilterContainer>
 
-      <FilterContainer>
-        <FilterName>Film</FilterName>
-        <Select
-          value={filters.film}
-          options={films}
-          defaultValue={films[0]}
-          isSearchable={true}
-          onChange={(value) =>
-            setFilters({
-              ...filters,
-              film: value,
-            })
-          }
-          styles={customSelectStyles}
-        />
-      </FilterContainer>
+        <FilterContainer>
+          <FilterName>Film</FilterName>
+          <Select
+            value={filters.film}
+            options={films}
+            defaultValue={films[0]}
+            isSearchable={true}
+            onChange={(value) =>
+              setFilters({
+                ...filters,
+                film: value,
+              })
+            }
+            styles={selectStyles}
+          />
+        </FilterContainer>
+      </SelectsContainer>
 
       <FilterContainer>
         <FilterName>Birth Year</FilterName>
@@ -132,6 +168,19 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
               yearsRange: value,
             });
           }}
+          trackStyle={[
+            {
+              backgroundColor: '#7ab6fc',
+            },
+          ]}
+          handleStyle={[
+            {
+              border: '2px solid #7ab6fc',
+            },
+            {
+              border: '2px solid #7ab6fc',
+            },
+          ]}
         />
         <YearsContainer>
           <YearIndicator>{filters.yearsRange[1]} BBY</YearIndicator>
@@ -150,6 +199,7 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
       </SwitchLogicContainer>
 
       <ResetButton onClick={resetFiltersHandler}>Reset filters</ResetButton>
+      <Divider />
     </Container>
   );
 };
@@ -186,6 +236,11 @@ const ResetButton = styled.div`
 
 const FilterContainer = styled.div`
   margin-bottom: 20px;
+  flex: 1;
+
+  &:first-of-type {
+    margin-right: 20px;
+  }
 `;
 
 const Title = styled.h4`
@@ -199,7 +254,6 @@ const FilterName = styled.span`
   font-family: 'Roboto';
   font-weight: 100;
   font-size: 20px;
-  text-transform: uppercase;
   color: #ffe81f;
 `;
 
@@ -220,6 +274,18 @@ const YearIndicator = styled.span`
   font-family: 'Roboto';
   font-size: 16px;
   font-weight: 300;
+`;
+
+const SelectsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  margin-top: 30px;
+  border: 1px solid #ffffff30;
 `;
 
 export default Filters;
