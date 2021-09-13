@@ -3,6 +3,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
 import { Range } from 'rc-slider';
+import Switch from 'react-switch';
 
 const DEFAULT_YEARS_RANGE = [8, 896];
 
@@ -81,39 +82,43 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
 
   return (
     <Container>
-      <p>Filter by</p>
-      <p>Specie</p>
-      <Select
-        value={filters.specie}
-        options={species}
-        defaultValue={species[0]}
-        isSearchable={true}
-        onChange={(value) =>
-          setFilters({
-            ...filters,
-            specie: value.reverse(),
-          })
-        }
-        styles={customSelectStyles}
-      />
-      <p>{isAndRelationship ? 'and' : 'or'}</p>
-      <p>Film</p>
-      <Select
-        value={filters.film}
-        options={films}
-        defaultValue={films[0]}
-        isSearchable={true}
-        onChange={(value) =>
-          setFilters({
-            ...filters,
-            film: value,
-          })
-        }
-        styles={customSelectStyles}
-      />
-      <p>{isAndRelationship ? 'and' : 'or'}</p>
-      <p>Birth Year</p>
-      <RangeContainer>
+      <Title>Filter by</Title>
+      <FilterContainer>
+        <FilterName>Specie</FilterName>
+        <Select
+          value={filters.specie}
+          options={species}
+          defaultValue={species[0]}
+          isSearchable={true}
+          onChange={(value) =>
+            setFilters({
+              ...filters,
+              specie: value,
+            })
+          }
+          styles={customSelectStyles}
+        />
+      </FilterContainer>
+
+      <FilterContainer>
+        <FilterName>Film</FilterName>
+        <Select
+          value={filters.film}
+          options={films}
+          defaultValue={films[0]}
+          isSearchable={true}
+          onChange={(value) =>
+            setFilters({
+              ...filters,
+              film: value,
+            })
+          }
+          styles={customSelectStyles}
+        />
+      </FilterContainer>
+
+      <FilterContainer>
+        <FilterName>Birth Year</FilterName>
         <Range
           defaultValue={DEFAULT_YEARS_RANGE}
           value={filters.yearsRange}
@@ -122,25 +127,28 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
           step={1}
           reverse
           onChange={(value) => {
-            console.log({ value });
             setFilters({
               ...filters,
               yearsRange: value,
             });
           }}
         />
-        <div style={{ display: 'inline-block' }}>
-          {filters.yearsRange[1]} BBY
-        </div>
-        <div style={{ display: 'inline-block', marginLeft: '50px' }}>
-          {filters.yearsRange[0]} BBY
-        </div>
-      </RangeContainer>
-      <ChangeFilteringLogicButton onClick={toggleFilteringLogic}>
-        {isAndRelationship
-          ? 'Seach by one of the criterias'
-          : 'Seach by all of criterias'}
-      </ChangeFilteringLogicButton>
+        <YearsContainer>
+          <YearIndicator>{filters.yearsRange[1]} BBY</YearIndicator>
+          <YearIndicator>{filters.yearsRange[0]} BBY</YearIndicator>
+        </YearsContainer>
+      </FilterContainer>
+
+      <SwitchLogicContainer>
+        <FilterName>Results must match all the filters</FilterName>
+        <Switch
+          onChange={toggleFilteringLogic}
+          checked={isAndRelationship}
+          offColor="#7ab6fc"
+          onColor="#ffe81f"
+        />
+      </SwitchLogicContainer>
+
       <ResetButton onClick={resetFiltersHandler}>Reset filters</ResetButton>
     </Container>
   );
@@ -150,16 +158,68 @@ const Container = styled.div`
   margin-bottom: 100px;
 `;
 
-const ResetButton = styled.button`
-  border: none;
+const ResetButton = styled.div`
+  width: 140px;
+  height: 40px;
+  background-color: none;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid #7ab6fc90;
+  border-radius: 6px;
+
+  color: #7ab6fc;
+  font-size: 18px;
+  font-family: 'Roboto';
+  font-weight: 100;
+
+  transition: all 0.3s;
+
+  &: hover {
+    background-color: #7ab6fc;
+    color: #fff;
+  }
 `;
 
-const ChangeFilteringLogicButton = styled.button`
-  margin-right: 30px;
+const FilterContainer = styled.div`
+  margin-bottom: 20px;
 `;
 
-const RangeContainer = styled.div`
-  height: 50px;
+const Title = styled.h4`
+  font-family: 'Roboto';
+  font-weight: 100;
+`;
+
+const FilterName = styled.span`
+  display: block;
+  margin-bottom: 16px;
+  font-family: 'Roboto';
+  font-weight: 100;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #ffe81f;
+`;
+
+const SwitchLogicContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 40px;
+`;
+
+const YearsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+`;
+
+const YearIndicator = styled.span`
+  font-family: 'Roboto';
+  font-size: 16px;
+  font-weight: 300;
 `;
 
 export default Filters;
