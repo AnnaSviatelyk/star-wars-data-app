@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import * as R from 'ramda';
+import React, { useState, useEffect, useCallback } from 'react';
+import { isEmpty, isNil } from 'ramda';
 import { useDrop } from 'react-dnd';
+import styled from 'styled-components';
 
-import DraggableTypes from '../../../constants/draggableTypes';
+import DraggableTypes from 'constants/draggableTypes';
+
 import ListItem from './ListItem';
 
 const Favorites = () => {
   const [favoriteCharacters, setFavouriteCharacters] = useState([]);
 
-  const handleDrop = (item) => {
+  const handleDrop = useCallback((item) => {
     setFavouriteCharacters((state) => {
       const isItemAlreadyExists = state.some((el) => el.name === item.name);
 
@@ -20,7 +21,7 @@ const Favorites = () => {
       localStorage.setItem('favorites', JSON.stringify([...state, item]));
       return [...state, item];
     });
-  };
+  }, []);
 
   const [{ isOver }, drop] = useDrop(
     () => ({
@@ -33,24 +34,27 @@ const Favorites = () => {
     [],
   );
 
+  const itemDeleteHandler = useCallback(
+    (id) => {
+      const newFavorites = favoriteCharacters.filter((el) => el.id !== id);
+
+      setFavouriteCharacters(newFavorites);
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    },
+    [favoriteCharacters],
+  );
+
   useEffect(() => {
     const persistedFavorites = localStorage.getItem('favorites');
-    if (!R.isNil(persistedFavorites)) {
+    if (!isNil(persistedFavorites)) {
       setFavouriteCharacters(JSON.parse(persistedFavorites));
     }
   }, []);
 
-  const itemDeleteHandler = (id) => {
-    const newFavorites = favoriteCharacters.filter((el) => el.id !== id);
-
-    setFavouriteCharacters(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify(newFavorites));
-  };
-
   return (
     <Container ref={drop} isOver={isOver}>
       <Title>Favorite Characters</Title>
-      {!R.isEmpty(favoriteCharacters) &&
+      {!isEmpty(favoriteCharacters) &&
         favoriteCharacters.map((el) => (
           <ListItem
             name={el.name}
@@ -66,16 +70,18 @@ const Favorites = () => {
 };
 
 const Container = styled.div`
-  flex: 1;
-  background-color: #1f2329;
   height: 100vh;
+  flex: 1;
   padding: 0px 30px 0px 30px;
+  background-color: #1f2329;
   overflow: scroll;
-  transition: all 0.3s;
+
   border-left: ${({ isOver }) =>
     !isOver ? '1px solid transparent' : '1px solid #7ab6fc'};
   border-right: ${({ isOver }) =>
     !isOver ? '1px solid transparent' : '1px solid #7ab6fc'};
+
+  transition: all 0.3s;
 `;
 
 const Title = styled.h4`

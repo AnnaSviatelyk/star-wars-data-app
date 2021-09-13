@@ -1,12 +1,23 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useContext,
+  useMemo,
+} from 'react';
 import styled from 'styled-components';
-import * as R from 'ramda';
+import { isEmpty } from 'ramda';
+
+import { DataContext } from 'App';
+import Yoda from 'assets/yoda.png';
+import Loader from 'components/shared/Loader';
 
 import Filters from './Filters';
 import ListItem from './ListItem';
-import Loader from '../../shared/Loader';
 
-const NamesList = ({ allPeople, species, films }) => {
+const NamesList = () => {
+  const { people, species, films } = useContext(DataContext);
+
   const [peopleToDisplay, setPeopleToDisplay] = useState([]);
 
   const listRef = useRef(null);
@@ -16,15 +27,20 @@ const NamesList = ({ allPeople, species, films }) => {
     [],
   );
 
+  const isAllDataFetched = useMemo(
+    () => !isEmpty(people) && !isEmpty(species) && !isEmpty(films),
+    [films, people, species],
+  );
+
   return (
-    <Container ref={listRef}>
-      {!R.isEmpty(allPeople) && !R.isEmpty(species) && !R.isEmpty(films) ? (
+    <Container ref={listRef} isAllDataFetched={isAllDataFetched}>
+      {isAllDataFetched ? (
         <>
           <Filters
             species={species}
             films={films}
             peopleToDisplay={peopleToDisplay}
-            allPeople={allPeople}
+            allPeople={people}
             setPeopleToDisplay={setPeopleToDisplay}
           />
 
@@ -39,16 +55,17 @@ const NamesList = ({ allPeople, species, films }) => {
           )}
 
           {peopleToDisplay.length === 0 && (
-            <NothingFoundMessage>
-              Opps, no characters found. <br />
-              Try another filter parameters
-            </NothingFoundMessage>
+            <NothingFoundMessageContainer>
+              <NothingFoundMessage>
+                Opps, no characters found... <br />
+                Try another filter parameters and may the force be with you!
+              </NothingFoundMessage>
+              <YodaImage src={Yoda} alt="yoda icon" />
+            </NothingFoundMessageContainer>
           )}
         </>
       ) : (
-        <LoaderContainer>
-          <Loader />
-        </LoaderContainer>
+        <Loader />
       )}
     </Container>
   );
@@ -61,14 +78,11 @@ const Container = styled.div`
   margin-right: 40px;
   background-color: #1f2329;
   overflow: scroll;
+
   display: flex;
   flex-direction: column;
-`;
 
-const LoaderContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  ${({ isAllDataFetched }) => !isAllDataFetched && 'justify-content: center'};
 `;
 
 const ScrollToTopButton = styled.button`
@@ -84,6 +98,19 @@ const ScrollToTopButton = styled.button`
 const NothingFoundMessage = styled.p`
   text-align: center;
   font-family: 'Roboto';
+  font-size: 20px;
+`;
+
+const YodaImage = styled.img`
+  width: 120px;
+`;
+
+const NothingFoundMessageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  width: 50%;
 `;
 
 export default NamesList;

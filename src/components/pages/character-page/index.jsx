@@ -1,12 +1,12 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
-import { isEmpty, isNil } from 'ramda';
 import axios from 'axios';
+import { isEmpty, isNil } from 'ramda';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
-import Loader from '../../shared/Loader';
-import { DataContext } from '../../../App';
-import convertNumberToRoman from '../../../helpers/convertNumberToRoman';
+import { DataContext } from 'App';
+import Loader from 'components/shared/Loader';
+import convertNumberToRoman from 'helpers/convertNumberToRoman';
 
 const CharacterPage = () => {
   let { id } = useParams();
@@ -53,10 +53,10 @@ const CharacterPage = () => {
       name,
       films: charactersFilmNames,
       species: isEmpty(charactersSpeciesNames)
-        ? 'unknown'
+        ? 'Unknown'
         : charactersSpeciesNames,
       starships: isEmpty(charactersStarshipsNames)
-        ? 'no starships'
+        ? 'No starships'
         : charactersStarshipsNames,
     });
   }, [id, people]);
@@ -72,9 +72,18 @@ const CharacterPage = () => {
       {!isNil(charactersData) ? (
         <div>
           <Name>{charactersData.name}</Name>
-          <p>Species: {charactersData.species}</p>
-          <p>Films: {charactersData.films}</p>
-          <p>Starships: {charactersData.starships}</p>
+          <CharacterInfoTitle>Species: </CharacterInfoTitle>
+          <CharacterInfoDecription>
+            {charactersData.species}
+          </CharacterInfoDecription>
+          <CharacterInfoTitle>Films: </CharacterInfoTitle>
+          <CharacterInfoDecription>
+            {charactersData.films}
+          </CharacterInfoDecription>
+          <CharacterInfoTitle>Starships:</CharacterInfoTitle>
+          <CharacterInfoDecription>
+            {charactersData.starships}
+          </CharacterInfoDecription>
         </div>
       ) : (
         <Loader />
@@ -85,20 +94,31 @@ const CharacterPage = () => {
 
 const Container = styled.div`
   width: 60%;
-  height: 500px;
+  min-height: 500px;
   margin: 0 auto;
   padding: 50px;
-
   display: flex;
   justify-content: ${({ isDataFetched }) =>
     isDataFetched ? 'flex-start' : 'center'};
   background-color: #1f2329;
+
   border-radius: 15px;
 `;
 
 const Name = styled.h2`
   font-family: 'SfDistantGalaxy';
   color: #ffe81f;
+`;
+
+const CharacterInfoTitle = styled.p`
+  font-family: 'SfDistantGalaxy-Italic';
+  font-size: 24px;
+  color: #ffe81f;
+`;
+
+const CharacterInfoDecription = styled.p`
+  font-family: 'Roboto';
+  font-size: 20px;
 `;
 
 export default CharacterPage;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import * as R from 'ramda';
+import { isEmpty } from 'ramda';
 import styled from 'styled-components';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
@@ -78,15 +78,15 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (R.isEmpty(people)) {
+    if (isEmpty(people)) {
       getPeople();
     }
 
-    if (R.isEmpty(films)) {
+    if (isEmpty(films)) {
       getFilms();
     }
 
-    if (R.isEmpty(species)) {
+    if (isEmpty(species)) {
       getSpecies();
     }
   }, [films, getFilms, getPeople, getSpecies, people, species]);

@@ -1,11 +1,10 @@
-import React, { useCallback } from 'react';
-import styled from 'styled-components';
+import React from 'react';
 import { useDrag } from 'react-dnd';
-
 import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
-import DraggableTypes from '../../../constants/draggableTypes';
-import DeleteIcon from '../../../assets/delete.svg';
+import DraggableTypes from 'constants/draggableTypes';
+import DeleteIcon from 'assets/delete.svg';
 
 const ListItem = ({ name, url, id, isFavorite, onDelete }) => {
   const [, drag] = useDrag(() => ({
@@ -16,15 +15,9 @@ const ListItem = ({ name, url, id, isFavorite, onDelete }) => {
     }),
   }));
 
-  const handleListItemClick = useCallback(() => {}, []);
-
   return (
     <StyledLink to={`/person/${id}`}>
-      <ItemContainer
-        onClick={handleListItemClick}
-        ref={drag}
-        isFavorite={isFavorite}
-      >
+      <ItemContainer ref={drag} isFavorite={isFavorite}>
         <NameText isFavorite={isFavorite}>{name}</NameText>
         {isFavorite && (
           <DeleteIconContainer
@@ -45,14 +38,16 @@ const ListItem = ({ name, url, id, isFavorite, onDelete }) => {
 const ItemContainer = styled.div`
   height: 80px;
   width: 100%;
+  position: relative;
   margin-bottom: 15px;
-  border: 0.5px dotted
-    ${({ isFavorite }) => (isFavorite ? '#7ab6fc70' : '#ffe81f70')};
+  padding: 15px;
 
   display: flex;
-  position: relative;
   align-items: center;
   justify-content: center;
+
+  border: 0.5px dotted
+    ${({ isFavorite }) => (isFavorite ? '#7ab6fc70' : '#ffe81f70')};
 
   font-family: 'SfDistantGalaxy-Italic';
 

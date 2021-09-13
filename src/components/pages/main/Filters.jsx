@@ -1,9 +1,9 @@
-import * as R from 'ramda';
-import React, { useCallback, useState, useEffect } from 'react';
-import Select from 'react-select';
-import styled from 'styled-components';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import { isEmpty } from 'ramda';
 import { Range } from 'rc-slider';
+import Select from 'react-select';
 import Switch from 'react-switch';
+import styled from 'styled-components';
 
 const DEFAULT_YEARS_RANGE = [8, 896];
 
@@ -22,10 +22,6 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
       yearsRange: DEFAULT_YEARS_RANGE,
     });
   }, [films, setFilters, species]);
-
-  const toggleFilteringLogic = useCallback(() => {
-    setIsAndRelationship((state) => !state);
-  }, []);
 
   const filterItems = useCallback(
     (person, key) => {
@@ -55,7 +51,7 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
       return filters[key].value !== 'all';
     });
 
-    if (R.isEmpty(activeFilters)) {
+    if (isEmpty(activeFilters)) {
       return setPeopleToDisplay(allPeople);
     }
 
@@ -70,49 +66,52 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
     setPeopleToDisplay(filteredPeople);
   }, [filters, allPeople, setPeopleToDisplay, isAndRelationship, filterItems]);
 
+  const selectStyles = useMemo(
+    () => ({
+      control: (provided) => ({
+        ...provided,
+        backgroundColor: '#333',
+        outline: 'none',
+        border: 'none',
+        boxShadow: 'none',
+      }),
+
+      singleValue: (provided) => ({
+        ...provided,
+        color: '#fff',
+        fontFamily: 'Roboto',
+        fontSize: 16,
+      }),
+      menu: (provided, state) => ({
+        ...provided,
+      }),
+      menuList: (provided) => ({
+        ...provided,
+        paddingTop: 0,
+        paddingBottom: 0,
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        color: state.isSelected ? '#333' : '#fff',
+        fontFamily: 'Roboto',
+        fontSize: 16,
+        padding: 20,
+        backgroundColor: state.isSelected
+          ? '#ffe81f'
+          : state.isFocused
+          ? '#33333380'
+          : '#333',
+        ':active': {
+          backgroundColor: !state.isDisabled && '#33333380',
+        },
+      }),
+    }),
+    [],
+  );
+
   useEffect(() => {
     filterCharachters();
   }, [filterCharachters]);
-
-  const selectStyles = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: '#333',
-      outline: 'none',
-      border: 'none',
-      boxShadow: 'none',
-    }),
-
-    singleValue: (provided) => ({
-      ...provided,
-      color: '#fff',
-      fontFamily: 'Roboto',
-      fontSize: 16,
-    }),
-    menu: (provided, state) => ({
-      ...provided,
-    }),
-    menuList: (provided) => ({
-      ...provided,
-      paddingTop: 0,
-      paddingBottom: 0,
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      color: state.isSelected ? '#333' : '#fff',
-      fontFamily: 'Roboto',
-      fontSize: 16,
-      padding: 20,
-      backgroundColor: state.isSelected
-        ? '#ffe81f'
-        : state.isFocused
-        ? '#33333380'
-        : '#333',
-      ':active': {
-        backgroundColor: !state.isDisabled && '#33333380',
-      },
-    }),
-  };
 
   return (
     <Container>
@@ -191,7 +190,7 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
       <SwitchLogicContainer>
         <FilterName>Results must match all the filters</FilterName>
         <Switch
-          onChange={toggleFilteringLogic}
+          onChange={() => setIsAndRelationship((state) => !state)}
           checked={isAndRelationship}
           offColor="#7ab6fc"
           onColor="#ffe81f"
@@ -205,7 +204,7 @@ const Filters = ({ species, films, allPeople, setPeopleToDisplay }) => {
 };
 
 const Container = styled.div`
-  margin-bottom: 100px;
+  margin-bottom: 60px;
 `;
 
 const ResetButton = styled.div`
@@ -251,6 +250,7 @@ const Title = styled.h4`
 const FilterName = styled.span`
   display: block;
   margin-bottom: 16px;
+
   font-family: 'Roboto';
   font-weight: 100;
   font-size: 20px;
@@ -285,7 +285,8 @@ const SelectsContainer = styled.div`
 const Divider = styled.div`
   width: 100%;
   margin-top: 30px;
-  border: 1px solid #ffffff30;
+  height: 1px;
+  background-color: #999999;
 `;
 
 export default Filters;

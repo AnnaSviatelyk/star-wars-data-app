@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import DarthVaderIcon from '../../assets/darth_vader.svg';
+import DarthVaderIcon from 'assets/darth_vader.svg';
 
 const Loader = () => {
   return (
@@ -23,6 +23,7 @@ const Container = styled.div`
 const LoaderContainer = styled.div`
   width: 64px;
   height: 64px;
+
   animation-name: spin;
   animation-duration: 5000ms;
   animation-iteration-count: infinite;
