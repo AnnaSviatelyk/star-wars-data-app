@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useDrop } from 'react-dnd';
 
 import DraggableTypes from '../../../constants/draggableTypes';
-import ListItem from '../names-section/ListItem';
+import ListItem from './ListItem';
 
 const Favorites = () => {
   const [favoriteCharacters, setFavouriteCharacters] = useState([]);
@@ -35,15 +35,31 @@ const Favorites = () => {
 
   useEffect(() => {
     const persistedFavorites = localStorage.getItem('favorites');
-    setFavouriteCharacters(JSON.parse(persistedFavorites));
+    if (!R.isNil(persistedFavorites)) {
+      setFavouriteCharacters(JSON.parse(persistedFavorites));
+    }
   }, []);
 
+  const itemDeleteHandler = (id) => {
+    const newFavorites = favoriteCharacters.filter((el) => el.id !== id);
+
+    setFavouriteCharacters(newFavorites);
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+  };
+
   return (
-    <Container ref={drop}>
-      <p>Favorites</p>
+    <Container ref={drop} isOver={isOver}>
+      <Title>Favorite Characters</Title>
       {!R.isEmpty(favoriteCharacters) &&
         favoriteCharacters.map((el) => (
-          <ListItem name={el.name} url={el.url} key={`fav_${el.url}`} />
+          <ListItem
+            name={el.name}
+            url={el.url}
+            key={`fav_${el.url}`}
+            id={el.id}
+            isFavorite
+            onDelete={itemDeleteHandler}
+          />
         ))}
     </Container>
   );
@@ -53,8 +69,18 @@ const Container = styled.div`
   flex: 1;
   background-color: #1f2329;
   height: 100vh;
-  padding-left: 30px;
+  padding: 0px 30px 0px 30px;
   overflow: scroll;
+  transition: all 0.3s;
+  border-left: ${({ isOver }) =>
+    !isOver ? '1px solid transparent' : '1px solid #7ab6fc'};
+  border-right: ${({ isOver }) =>
+    !isOver ? '1px solid transparent' : '1px solid #7ab6fc'};
+`;
+
+const Title = styled.h4`
+  font-family: 'Roboto';
+  font-weight: 200;
 `;
 
 export default Favorites;
