@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-import NamesList from './components/names-section/NamesList';
-import Favorites from './components/favorites-section/Favorites';
+import NamesList from './NamesList';
+import Favorites from './FavoritesList';
+import { DataContext } from '../../../App';
 
-const Main = () => {};
+const Main = () => {
+  const { people, species, films } = useContext(DataContext);
+
+  return (
+    <>
+      <NamesList allPeople={people} species={species} films={films} />
+      <Favorites />
+    </>
+  );
+};
 
 export default Main;

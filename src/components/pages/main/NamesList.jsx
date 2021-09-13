@@ -4,7 +4,7 @@ import * as R from 'ramda';
 
 import Filters from './Filters';
 import ListItem from './ListItem';
-import Loader from '../../../shared/Loader';
+import Loader from '../../shared/Loader';
 
 const NamesList = ({ allPeople, species, films }) => {
   const [peopleToDisplay, setPeopleToDisplay] = useState([]);
@@ -39,10 +39,10 @@ const NamesList = ({ allPeople, species, films }) => {
           )}
 
           {peopleToDisplay.length === 0 && (
-            <p>
+            <NothingFoundMessage>
               Opps, no characters found. <br />
               Try another filter parameters
-            </p>
+            </NothingFoundMessage>
           )}
         </>
       ) : (
@@ -57,7 +57,7 @@ const NamesList = ({ allPeople, species, films }) => {
 const Container = styled.div`
   width: 55%;
   height: 100vh;
-  padding: 50px 50px 50px 50px;
+  padding: 0px 50px 50px 50px;
   margin-right: 40px;
   background-color: #1f2329;
   overflow: scroll;
@@ -79,6 +79,11 @@ const ScrollToTopButton = styled.button`
   font-family: 'SfDistantGalaxy';
   font-size: 16px;
   color: white;
+`;
+
+const NothingFoundMessage = styled.p`
+  text-align: center;
+  font-family: 'Roboto';
 `;
 
 export default NamesList;

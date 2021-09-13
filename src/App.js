@@ -6,14 +6,20 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { Switch, Route } from 'react-router-dom';
 
-import NamesList from './components/names-section/NamesList';
-import Favorites from './components/favorites-section/Favorites';
 import convertNumberToRoman from './helpers/convertNumberToRoman';
 import toDashCase from './helpers/toDashCase';
+import Main from './components/pages/main';
+import CharacterPage from './components/pages/character-page';
 
 const SWAPI_BASE_URL = 'https://swapi.dev/api/';
 const TOTAL_PEOPLE_PAGES = 9;
 const TOTAL_SPECIES_PAGES = 4;
+
+export const DataContext = React.createContext({
+  people: [],
+  species: [],
+  films: [],
+});
 
 const App = () => {
   const [people, setPeople] = useState([]);
@@ -28,8 +34,7 @@ const App = () => {
     const results = await axios.all(urls.map((url) => axios.get(url)));
 
     const peopleData = results
-      .map((el) => el.data.results)
-      .flat()
+      .flatMap((el) => el.data.results)
       .map((el) => ({
         name: el.name,
         url: el.url,
@@ -40,8 +45,6 @@ const App = () => {
         starships: el.starships,
         id: toDashCase(el.name),
       }));
-
-    console.log({ peopleData });
 
     setPeople(peopleData);
   }, []);
@@ -89,25 +92,22 @@ const App = () => {
   }, [films, getFilms, getPeople, getSpecies, people, species]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <AppContainer>
-        <Switch>
-          <Route path="/person/:id">
-            <div>TEEEEEEEESTTTTTTT</div>
-          </Route>
-          <Route exact path="/">
-            <NamesList allPeople={people} species={species} films={films} />
-            <Favorites />
-          </Route>
-        </Switch>
-      </AppContainer>
-    </DndProvider>
+    <DataContext.Provider value={{ people, species, films }}>
+      <DndProvider backend={HTML5Backend}>
+        <AppContainer>
+          <Switch>
+            <Route path="/person/:id" component={CharacterPage} />
+            <Route exact path="/" component={Main} />
+          </Switch>
+        </AppContainer>
+      </DndProvider>
+    </DataContext.Provider>
   );
 };
 
 const AppContainer = styled.div`
   background-color: #282c34;
-  max-height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: row;
   align-items: center;

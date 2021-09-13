@@ -1,15 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import DarthVaderIcon from '../assets/darth_vader.svg';
+import DarthVaderIcon from '../../assets/darth_vader.svg';
 
 const Loader = () => {
   return (
-    <LoaderContainer>
-      <img src={DarthVaderIcon} alt="darth wader loader" />
-    </LoaderContainer>
+    <Container>
+      <LoaderContainer>
+        <img src={DarthVaderIcon} alt="darth wader loader" />
+      </LoaderContainer>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
 const LoaderContainer = styled.div`
   width: 64px;
